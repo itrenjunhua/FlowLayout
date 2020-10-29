@@ -17,7 +17,17 @@ import android.view.View;
  * ======================================================================
  */
 public abstract class PullFlowLayoutAdapter {
+    private PullFlowLayout pullFlowLayout;
+
     protected abstract View createView(Context context, int position, PullFlowLayout pullFlowLayout);
 
     public abstract int getViewCount();
+
+    protected void setPullFlowLayout(PullFlowLayout pullFlowLayout) {
+        this.pullFlowLayout = pullFlowLayout;
+    }
+
+    public void notifyChange() {
+        pullFlowLayout.requestLayout();
+    }
 }

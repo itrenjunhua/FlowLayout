@@ -3,9 +3,10 @@ package com.renj.flowlayout;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Scroller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,10 @@ import java.util.List;
  * ======================================================================
  */
 public class PullFlowLayout extends ViewGroup {
+    private int viewContentHeight = 0;
+    private int viewReallyHeight = 0;
+    private Scroller mScroller;
+
     private int totalRowCount; // 总行数
     private List<ChildViewInfo> childViewList = new ArrayList<>(); // 所有子控件集合
     private PullFlowLayoutAdapter pullFlowLayoutAdapter;
@@ -47,12 +52,19 @@ public class PullFlowLayout extends ViewGroup {
     }
 
     private void init(Context context, AttributeSet attrs) {
-
+        mScroller = new Scroller(context);
     }
 
     public void setAdapter(PullFlowLayoutAdapter pullFlowLayoutAdapter) {
-        this.pullFlowLayoutAdapter = pullFlowLayoutAdapter;
-        requestLayout();
+        if (pullFlowLayoutAdapter != null) {
+            this.pullFlowLayoutAdapter = pullFlowLayoutAdapter;
+            pullFlowLayoutAdapter.setPullFlowLayout(this);
+            requestLayout();
+        }
+    }
+
+    public int getTotalRowCount() {
+        return totalRowCount;
     }
 
     @Override
@@ -67,6 +79,7 @@ public class PullFlowLayout extends ViewGroup {
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        viewContentHeight = heightSize - getPaddingTop() - getPaddingBottom();
 
         // 所有孩子控件都完全显示需要的高度，默认加上顶部的 padding 值
         int flowLayoutReallyHeight = getPaddingTop();
@@ -130,6 +143,7 @@ public class PullFlowLayout extends ViewGroup {
         }
         // 加上底部 padding 值
         flowLayoutReallyHeight += getPaddingBottom();
+        viewReallyHeight = flowLayoutReallyHeight;
 
         // 确定高度
         if (heightMode == MeasureSpec.EXACTLY) {
@@ -146,8 +160,62 @@ public class PullFlowLayout extends ViewGroup {
         if (childViewList.isEmpty()) return;
 
         for (ChildViewInfo childViewInfo : childViewList) {
-            Log.i("Renj", childViewInfo.toString());
             childViewInfo.onLayout();
+        }
+    }
+
+    int lastY;
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (viewReallyHeight > viewContentHeight) {
+            int y = (int) event.getY();
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    lastY = y;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if (!mScroller.isFinished()) {
+                        mScroller.abortAnimation();
+                    }
+                    int dy = lastY - y;
+                    if (dy < 0) {
+                        if (getScrollY() + dy < 0) {
+                            dy = -getScrollY();
+                        }
+                    } else {
+                        if (getScrollY() + dy + viewContentHeight > viewReallyHeight) {
+                            dy = viewReallyHeight - viewContentHeight - getScrollY() - getPaddingBottom();
+                        }
+                    }
+
+                    Log.i("Renj", "------ " + getScrollY() + " " + getPaddingTop() + "  " + getPaddingBottom());
+                    Log.i("Renj", "viewReallyHeight " + viewReallyHeight + " viewContentHeight: " + viewContentHeight);
+
+                    scrollBy(0, dy);
+                    lastY = y;
+                    break;
+                case MotionEvent.ACTION_UP:
+//                    if (getScrollY() > viewReallyHeight - viewContentHeight) {
+//                        mScroller.startScroll(0, getScrollY(), 0, -(getScrollY() - (viewReallyHeight - viewContentHeight) - getPaddingTop()));
+//                    } else if (getScrollY() < 0) {
+//                        mScroller.startScroll(0, getScrollY(), 0, -getScrollY());
+//                    }
+                    break;
+            }
+            postInvalidate();
+            return true;
+        } else {
+            return super.onTouchEvent(event);
+        }
+    }
+
+    @Override
+    public void computeScroll() {
+        super.computeScroll();
+        if (mScroller.computeScrollOffset()) {
+            scrollTo(0, mScroller.getCurrY());
+            postInvalidate();
         }
     }
 

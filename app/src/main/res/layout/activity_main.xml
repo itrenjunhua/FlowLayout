@@ -1,19 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/bt_add_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="增加数据"
+        android:textColor="#333333"
+        android:textSize="16sp" />
 
     <com.renj.flowlayout.PullFlowLayout
         android:id="@+id/flow_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:layout_weight="1"
         android:background="@color/colorAccent"
         android:paddingStart="12dp"
         android:paddingTop="8dp"
         android:paddingEnd="8dp"
         android:paddingBottom="12dp" />
-
-</FrameLayout>
+</LinearLayout>
