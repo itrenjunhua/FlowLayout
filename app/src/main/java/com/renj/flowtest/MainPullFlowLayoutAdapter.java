@@ -1,7 +1,6 @@
 package com.renj.flowtest;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -43,11 +42,17 @@ public class MainPullFlowLayoutAdapter extends PullFlowLayoutAdapter {
         TextView textView = new TextView(context);
         textView.setText(dataList.get(position));
         textView.setTextSize(16);
-        textView.setTextColor(Color.WHITE);
-        textView.setBackgroundResource(R.drawable.shape_text_bg);
+        if (position % 4 == 0) {
+            textView.setTextColor(context.getResources().getColor(R.color.color_white));
+            textView.setBackgroundResource(R.drawable.shape_text_bg2);
+        } else {
+            textView.setTextColor(context.getResources().getColor(R.color.color_text_grey));
+            textView.setBackgroundResource(R.drawable.shape_text_bg);
+        }
         ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.topMargin = 8;
-        params.rightMargin = 12;
+        params.topMargin = 12;
+        params.leftMargin = 6;
+        params.rightMargin = 6;
         textView.setLayoutParams(params);
         textView.setPadding(16, 6, 16, 6);
         return textView;
