@@ -5,8 +5,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.renj.flowlayout.PullFlowLayout;
+import com.renj.flowlayout.FlowLayout;
 import com.renj.flowlayout.PullFlowLayoutAdapter;
+import com.renj.flowtest.utils.ListUtils;
 
 import java.util.List;
 
@@ -23,11 +24,21 @@ import java.util.List;
  * <p>
  * ======================================================================
  */
-public class MainPullFlowLayoutAdapter extends PullFlowLayoutAdapter {
+public class MainFlowLayoutAdapter extends PullFlowLayoutAdapter {
     private List<String> dataList;
+    private int mCheckedPosition = -1;
 
-    public MainPullFlowLayoutAdapter(List<String> datas) {
+    public MainFlowLayoutAdapter(List<String> datas) {
         this.dataList = datas;
+    }
+
+    public void setCheckedPosition(int checkedPosition) {
+        if (this.mCheckedPosition == checkedPosition) {
+            this.mCheckedPosition = -1;
+        } else {
+            this.mCheckedPosition = checkedPosition;
+        }
+        notifyChange();
     }
 
     public void addData(List<String> datas) {
@@ -38,11 +49,11 @@ public class MainPullFlowLayoutAdapter extends PullFlowLayoutAdapter {
     }
 
     @Override
-    protected View createView(Context context, int position, PullFlowLayout pullFlowLayout) {
+    protected View createView(Context context, FlowLayout flowLayout, int position) {
         TextView textView = new TextView(context);
         textView.setText(dataList.get(position));
         textView.setTextSize(16);
-        if (position % 4 == 0) {
+        if (position == mCheckedPosition) {
             textView.setTextColor(context.getResources().getColor(R.color.color_white));
             textView.setBackgroundResource(R.drawable.shape_text_bg2);
         } else {
@@ -50,16 +61,27 @@ public class MainPullFlowLayoutAdapter extends PullFlowLayoutAdapter {
             textView.setBackgroundResource(R.drawable.shape_text_bg);
         }
         ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.topMargin = 12;
-        params.leftMargin = 6;
-        params.rightMargin = 6;
+        params.topMargin = dip2px(context, 6);
+        params.leftMargin = dip2px(context, 3);
+        params.rightMargin = dip2px(context, 3);
         textView.setLayoutParams(params);
         textView.setPadding(16, 6, 16, 6);
         return textView;
     }
 
     @Override
-    public int getViewCount() {
+    public int getItemCount() {
         return dataList == null ? 0 : dataList.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        if (ListUtils.isEmpty(dataList)) return null;
+        return dataList.get(position);
+    }
+
+    public int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
     }
 }

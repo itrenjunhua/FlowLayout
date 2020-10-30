@@ -10,24 +10,27 @@ import android.view.View;
  * <p>
  * 创建时间：2020-10-29   14:29
  * <p>
- * 描述：
+ * 描述：流式布局控件适配器
  * <p>
  * 修订历史：
  * <p>
  * ======================================================================
  */
 public abstract class PullFlowLayoutAdapter {
-    private PullFlowLayout pullFlowLayout;
+    private FlowLayout flowLayout;
 
-    protected abstract View createView(Context context, int position, PullFlowLayout pullFlowLayout);
+    protected abstract View createView(Context context, FlowLayout flowLayout, int position);
 
-    public abstract int getViewCount();
+    public abstract int getItemCount();
 
-    protected void setPullFlowLayout(PullFlowLayout pullFlowLayout) {
-        this.pullFlowLayout = pullFlowLayout;
+    public abstract Object getItem(int position);
+
+    protected void setFlowLayout(FlowLayout flowLayout) {
+        this.flowLayout = flowLayout;
     }
 
     public void notifyChange() {
-        pullFlowLayout.requestLayout();
+        flowLayout.requestLayout();
     }
+
 }

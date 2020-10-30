@@ -7,23 +7,59 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/bt_add_data"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="增加数据"
-        android:textColor="#333333"
-        android:textSize="16sp" />
+        android:layout_margin="16dp"
+        android:orientation="vertical">
 
-    <com.renj.flowlayout.PullFlowLayout
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_input_rows"
+                android:layout_width="150dp"
+                android:layout_height="36dp"
+                android:background="@drawable/shape_text_bg"
+                android:gravity="center"
+                android:hint="最大显示行数"
+                android:inputType="number"
+                android:textColor="@color/color_black"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/bt_apply_rows"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:text="确定"
+                android:textColor="#333333"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/bt_add_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="增加数据"
+            android:textColor="#333333"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <com.renj.flowlayout.FlowLayout
         android:id="@+id/flow_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="20dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:background="@color/colorAccent"
         android:paddingStart="12dp"
         android:paddingTop="8dp"
         android:paddingEnd="8dp"
         android:paddingBottom="12dp" />
+
 </LinearLayout>

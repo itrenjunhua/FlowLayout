@@ -1,8 +1,7 @@
-package com.renj.flowtest;
+package com.renj.flowtest.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * ======================================================================
@@ -25,10 +24,9 @@ public class DataUtils {
             , "就", "姓名", "", "好啊，谁", "吗", "qws", "名称", "一下", "222"};
 
     public static List<String> getDataList(int dataCount) {
-        Random random = new Random();
         List<String> result = new ArrayList<>();
         for (int i = 0; i < dataCount; i++) {
-            result.add(strings1[random.nextInt(strings1.length)] + strings2[random.nextInt(strings2.length)]);
+            result.add(strings1[RandomUtils.randomInt(strings1.length)] + strings2[RandomUtils.randomInt(strings2.length)]);
         }
         return result;
     }
