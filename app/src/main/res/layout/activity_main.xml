@@ -10,7 +10,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="12dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -18,6 +20,89 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/bt_default"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="恢复默认"
+                android:textColor="@color/color_black"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/bt_add_data"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="增加数据"
+                android:textColor="@color/color_black"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="对齐方式："
+                android:textColor="@color/color_black"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/bt_gravity_left"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="左"
+                android:textColor="@color/color_black"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/bt_gravity_right"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="右"
+                android:textColor="@color/color_black"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/bt_gravity_leftRight"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="两端"
+                android:textColor="@color/color_black"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/bt_gravity_center"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="居中"
+                android:textColor="@color/color_black"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="最大显示行数："
+                android:textColor="@color/color_black"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/et_input_rows"
@@ -37,18 +122,10 @@
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:text="确定"
-                android:textColor="#333333"
+                android:textColor="@color/color_black"
                 android:textSize="16sp" />
 
         </LinearLayout>
-
-        <Button
-            android:id="@+id/bt_add_data"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="增加数据"
-            android:textColor="#333333"
-            android:textSize="16sp" />
 
     </LinearLayout>
 
@@ -56,10 +133,12 @@
         android:id="@+id/flow_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:background="@color/colorAccent"
         android:paddingStart="12dp"
         android:paddingTop="8dp"
         android:paddingEnd="8dp"
-        android:paddingBottom="12dp" />
+        android:paddingBottom="12dp"
+        app:flow_horizontal_gravity="right" />
 
 </LinearLayout>

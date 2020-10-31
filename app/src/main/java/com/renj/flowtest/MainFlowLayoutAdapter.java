@@ -9,6 +9,7 @@ import com.renj.flowlayout.FlowLayout;
 import com.renj.flowlayout.FlowLayoutAdapter;
 import com.renj.flowtest.utils.ListUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,6 +40,18 @@ public class MainFlowLayoutAdapter extends FlowLayoutAdapter {
             this.mCheckedPosition = checkedPosition;
         }
         notifyChange();
+    }
+
+    public void setNewData(List<String> datas) {
+        if (datas != null) {
+            if (this.dataList == null) {
+                this.dataList = new ArrayList<>();
+            } else {
+                this.dataList.clear();
+            }
+            this.dataList.addAll(datas);
+            notifyChange();
+        }
     }
 
     public void addData(List<String> datas) {

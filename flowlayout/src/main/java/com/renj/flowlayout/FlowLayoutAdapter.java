@@ -10,7 +10,7 @@ import android.view.View;
  * <p>
  * 创建时间：2020-10-29   14:29
  * <p>
- * 描述：流式布局控件适配器
+ * 描述：流式布局({@link FlowLayout})控件适配器
  * <p>
  * 修订历史：
  * <p>

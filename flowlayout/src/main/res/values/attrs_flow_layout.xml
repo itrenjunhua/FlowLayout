@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="FlowLayout">
+        <!-- 最大显示行数 -->
+        <attr name="flow_max_row_count" format="integer" />
+        <!-- 每一行水平方向对齐方式 -->
+        <attr name="flow_horizontal_gravity" format="enum">
+            <!-- 每一行水平方向对齐方式：左对齐，默认 -->
+            <enum name="left" value="0" />
+            <!-- 每一行水平方向对齐方式：右对齐 -->
+            <enum name="right" value="1" />
+            <!-- 每一行水平方向对齐方式：左右对齐 -->
+            <enum name="left_right" value="2" />
+            <!-- 每一行水平方向对齐方式：居中对齐 -->
+            <enum name="center" value="3" />
+        </attr>
+    </declare-styleable>
+
+</resources>
