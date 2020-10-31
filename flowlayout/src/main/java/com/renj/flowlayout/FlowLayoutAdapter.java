@@ -16,7 +16,7 @@ import android.view.View;
  * <p>
  * ======================================================================
  */
-public abstract class PullFlowLayoutAdapter {
+public abstract class FlowLayoutAdapter {
     private FlowLayout flowLayout;
 
     protected abstract View createView(Context context, FlowLayout flowLayout, int position);

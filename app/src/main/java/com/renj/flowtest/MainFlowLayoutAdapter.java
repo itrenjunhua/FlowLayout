@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.renj.flowlayout.FlowLayout;
-import com.renj.flowlayout.PullFlowLayoutAdapter;
+import com.renj.flowlayout.FlowLayoutAdapter;
 import com.renj.flowtest.utils.ListUtils;
 
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.List;
  * <p>
  * ======================================================================
  */
-public class MainFlowLayoutAdapter extends PullFlowLayoutAdapter {
+public class MainFlowLayoutAdapter extends FlowLayoutAdapter {
     private List<String> dataList;
     private int mCheckedPosition = -1;
 

@@ -19,7 +19,6 @@ import java.util.List;
  * 创建时间：2020-10-29   09:51
  * <p>
  * 描述：流式布局控件  需要继续实现功能：
- * 增加布局完成监听，获取部分数据布局未完成时，结果异常；
  * 行内对齐方式；
  * 增加属性控制：最大行数，对齐方式，水平和垂直方向间距；
  * Adapter控件回收机制
@@ -35,11 +34,11 @@ public class FlowLayout extends ViewGroup {
     private Scroller mScroller; // 支持滑动
     private VelocityTracker mVelocityTracker; // ACTION_UP 时测速
 
-    private boolean isShowFinish = true; // 是否已经全部显示完成了
+    private boolean childViewShowFinish = true; // 子控件是否已经全部显示完成了
     private int mTotalRowCount; // 总行数
     private int mMaxRowCount = Integer.MAX_VALUE; // 显示最大行数
     private List<ChildViewInfo> mChildViewList = new ArrayList<>(); // 所有子控件集合
-    private PullFlowLayoutAdapter mPullFlowLayoutAdapter;
+    private FlowLayoutAdapter mFlowLayoutAdapter;
 
     public FlowLayout(Context context) {
         this(context, null);
@@ -67,12 +66,12 @@ public class FlowLayout extends ViewGroup {
     /**
      * 设置适配器
      *
-     * @param pullFlowLayoutAdapter
+     * @param flowLayoutAdapter
      */
-    public void setAdapter(PullFlowLayoutAdapter pullFlowLayoutAdapter) {
-        if (pullFlowLayoutAdapter != null) {
-            this.mPullFlowLayoutAdapter = pullFlowLayoutAdapter;
-            pullFlowLayoutAdapter.setFlowLayout(this);
+    public void setAdapter(FlowLayoutAdapter flowLayoutAdapter) {
+        if (flowLayoutAdapter != null) {
+            this.mFlowLayoutAdapter = flowLayoutAdapter;
+            flowLayoutAdapter.setFlowLayout(this);
             requestLayout();
         }
     }
@@ -84,7 +83,9 @@ public class FlowLayout extends ViewGroup {
      */
     public void setMaxRowCount(int maxRowCount) {
         if ((maxRowCount == mMaxRowCount)
-                || (maxRowCount < 0 && mMaxRowCount < 0)) {
+                || (maxRowCount < 0 && mMaxRowCount < 0)
+                || (childViewShowFinish && maxRowCount > mTotalRowCount)
+                || (childViewShowFinish && maxRowCount < 0)) {
             return;
         }
 
@@ -113,28 +114,36 @@ public class FlowLayout extends ViewGroup {
      *
      * @return
      */
-    public boolean isShowFinish() {
-        return isShowFinish;
+    public boolean isChildViewShowFinish() {
+        return childViewShowFinish;
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         removeAllViews();
-        isShowFinish = true;
-        if (mPullFlowLayoutAdapter == null) {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-            return;
-        }
+        mChildViewList.clear();
+        mTotalRowCount = 0;
 
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+        if (mFlowLayoutAdapter == null || mMaxRowCount == 0) {
+            // 确定高度
+            if (heightMode == MeasureSpec.EXACTLY) {
+                heightMeasureSpec = MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.EXACTLY);
+            } else {
+                heightMeasureSpec = MeasureSpec.makeMeasureSpec(getPaddingTop() + getPaddingBottom(), MeasureSpec.EXACTLY);
+            }
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            return;
+        }
         // 内容显示高度
         mViewContentHeight = heightSize - getPaddingTop() - getPaddingBottom();
 
         // 所有孩子控件都完全显示需要的高度，默认加上顶部的 padding 值
         int flowLayoutReallyHeight = getPaddingTop();
-        int childCount = mPullFlowLayoutAdapter.getItemCount();
+        int childCount = mFlowLayoutAdapter.getItemCount();
         if (childCount > 0) {
             mChildViewList.clear();
             // 父控件可以存放子控件的内容，父控件的宽度，减去左右两边的 padding 值
@@ -147,7 +156,7 @@ public class FlowLayout extends ViewGroup {
             mTotalRowCount = 1;
 
             for (int i = 0; i < childCount; i++) {
-                View childView = mPullFlowLayoutAdapter.createView(getContext(), this, i);
+                View childView = mFlowLayoutAdapter.createView(getContext(), this, i);
                 addView(childView);
 
                 measureChild(childView, widthMeasureSpec, heightMeasureSpec);
@@ -164,43 +173,43 @@ public class FlowLayout extends ViewGroup {
                     childViewBottomMargin = marginLayoutParams.bottomMargin;
                 }
 
-                int measuredWidth = childView.getMeasuredWidth();
-                int measuredHeight = childView.getMeasuredHeight();
+                int childViewWidth = childView.getMeasuredWidth() + childViewLeftMargin + childViewRightMargin;
+                int childViewHeight = childView.getMeasuredHeight() + childViewTopMargin + childViewBottomMargin;
                 // 计算当前行已使用的宽度
-                currentRowWidth += measuredWidth + childViewLeftMargin + childViewRightMargin;
+                currentRowWidth += childViewWidth;
                 // 取一行最大高度为行高
-                currentRowMaxHeight = Math.max(measuredHeight + childViewTopMargin + childViewBottomMargin, currentRowMaxHeight);
+                currentRowMaxHeight = Math.max(childViewHeight, currentRowMaxHeight);
                 // 换行
                 if (currentRowWidth > flowLayoutContentWidth) {
                     // 增加上一行高度
-                    if (mTotalRowCount <= mMaxRowCount)
-                        flowLayoutReallyHeight += currentRowMaxHeight;
+                    flowLayoutReallyHeight += currentRowMaxHeight;
                     // 计算新行已使用宽度
-                    currentRowWidth = measuredWidth + childViewLeftMargin + childViewRightMargin;
+                    currentRowWidth = childViewWidth;
                     // 新行高度
-                    currentRowMaxHeight = measuredHeight + childViewTopMargin + childViewBottomMargin;
+                    currentRowMaxHeight = childViewHeight;
                     // 总行数加1
                     mTotalRowCount += 1;
                     // 显示最大行数控制
                     if (mTotalRowCount > mMaxRowCount) {
-                        isShowFinish = i == childCount - 1;
+                        // 超过最大行数的部分，减掉
+                        mTotalRowCount -= 1;
+                        currentRowMaxHeight = 0;
                         break;
                     }
                 }
 
                 // 确定当前子控件所在的位置
                 ChildViewInfo childViewInfo = new ChildViewInfo(childView);
-                childViewInfo.left = currentRowWidth - measuredWidth - childViewRightMargin + getPaddingLeft();
+                childViewInfo.left = currentRowWidth - childViewWidth - childViewRightMargin + getPaddingLeft();
                 childViewInfo.top = flowLayoutReallyHeight + childViewTopMargin;
                 childViewInfo.right = currentRowWidth - childViewRightMargin + getPaddingLeft();
-                childViewInfo.bottom = flowLayoutReallyHeight + childViewTopMargin + measuredHeight;
+                childViewInfo.bottom = flowLayoutReallyHeight + childViewTopMargin + childViewHeight;
                 childViewInfo.rowNumber = mTotalRowCount;
                 childViewInfo.position = i;
                 mChildViewList.add(childViewInfo);
             }
             // 加上最后一行高度
-            if (mTotalRowCount <= mMaxRowCount)
-                flowLayoutReallyHeight += currentRowMaxHeight;
+            flowLayoutReallyHeight += currentRowMaxHeight;
         }
         // 加上底部 padding 值
         flowLayoutReallyHeight += getPaddingBottom();
@@ -220,7 +229,17 @@ public class FlowLayout extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        if (mChildViewList.isEmpty()) return;
+        if (mFlowLayoutAdapter != null) {
+            childViewShowFinish = mFlowLayoutAdapter.getItemCount() == mChildViewList.size();
+        } else {
+            childViewShowFinish = true;
+        }
+
+        if (mChildViewList.isEmpty()) {
+            if (onLayoutFinishListener != null)
+                onLayoutFinishListener.onLayoutFinish(this, mChildViewList.size());
+            return;
+        }
 
         for (final ChildViewInfo childViewInfo : mChildViewList) {
             childViewInfo.onLayout();
@@ -228,11 +247,13 @@ public class FlowLayout extends ViewGroup {
                 @Override
                 public void onClick(View v) {
                     if (onItemClickListener != null) {
-                        onItemClickListener.onItemClick(mPullFlowLayoutAdapter, childViewInfo.position);
+                        onItemClickListener.onItemClick(mFlowLayoutAdapter, childViewInfo.position);
                     }
                 }
             });
         }
+        if (onLayoutFinishListener != null)
+            onLayoutFinishListener.onLayoutFinish(this, mChildViewList.size());
     }
 
     @Override
@@ -375,6 +396,23 @@ public class FlowLayout extends ViewGroup {
     }
 
     private OnItemClickListener onItemClickListener;
+    private OnLayoutFinishListener onLayoutFinishListener;
+
+    /**
+     * 设置孩子控件布局完成监听
+     *
+     * @param onLayoutFinishListener
+     */
+    public void setOnLayoutFinishListener(OnLayoutFinishListener onLayoutFinishListener) {
+        this.onLayoutFinishListener = onLayoutFinishListener;
+    }
+
+    /**
+     * 移除孩子控件布局完成监听
+     */
+    public void removeOnLayoutFinishListener() {
+        this.onLayoutFinishListener = null;
+    }
 
     /**
      * 设置孩子控件点击监听
@@ -389,6 +427,17 @@ public class FlowLayout extends ViewGroup {
      * 孩子控件点击监听
      */
     public interface OnItemClickListener {
-        void onItemClick(PullFlowLayoutAdapter adapter, int position);
+        void onItemClick(FlowLayoutAdapter adapter, int position);
+    }
+
+    /**
+     * 孩子控件布局完成监听
+     */
+    public interface OnLayoutFinishListener {
+        /**
+         * @param flowLayout
+         * @param childCount 当前完成布局的孩子数（显示的孩子数）
+         */
+        void onLayoutFinish(FlowLayout flowLayout, int childCount);
     }
 }

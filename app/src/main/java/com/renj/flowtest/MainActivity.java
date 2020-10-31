@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText etInputRows;
     private Button btApplyRows;
 
-    private MainFlowLayoutAdapter pullFlowLayoutAdapter;
+    private MainFlowLayoutAdapter flowLayoutAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,27 +30,40 @@ public class MainActivity extends AppCompatActivity {
         etInputRows = findViewById(R.id.et_input_rows);
         btApplyRows = findViewById(R.id.bt_apply_rows);
 
-        pullFlowLayoutAdapter = new MainFlowLayoutAdapter(DataUtils.getDataList(30));
-        flowLayout.setAdapter(pullFlowLayoutAdapter);
+        flowLayoutAdapter = new MainFlowLayoutAdapter(DataUtils.getDataList(30));
+        flowLayout.setAdapter(flowLayoutAdapter);
+
+        setFlowLayoutFinishListener();
 
         // 设置点击监听
         flowLayout.setOnItemClickListener((adapter, position) -> {
-            pullFlowLayoutAdapter.setCheckedPosition(position);
-            Object item = pullFlowLayoutAdapter.getItem(position);
+            // 移除孩子控件布局完成监听
+            flowLayout.removeOnLayoutFinishListener();
+            flowLayoutAdapter.setCheckedPosition(position);
+            Object item = flowLayoutAdapter.getItem(position);
             ToastUtils.showToast(item + "");
         });
 
         // 增加数据
         btAddData.setOnClickListener(v -> {
-            pullFlowLayoutAdapter.addData(DataUtils.getDataList(10));
-            Logger.i("总行数: " + flowLayout.getTotalRowCount());
+            setFlowLayoutFinishListener();
+            flowLayoutAdapter.addData(DataUtils.getDataList(10));
         });
 
         // 设置行数
         btApplyRows.setOnClickListener(v -> {
+            setFlowLayoutFinishListener();
             flowLayout.setMaxRowCount(getNumberFormText(etInputRows));
-            Logger.i("总行数: " + flowLayout.getTotalRowCount());
-            ToastUtils.showToast(flowLayout.isShowFinish() + "");
+        });
+    }
+
+    // 设置孩子控件布局完成监听
+    private void setFlowLayoutFinishListener() {
+        flowLayout.setOnLayoutFinishListener((flowLayout, childCount) -> {
+            Logger.i("总行数: " + flowLayout.getTotalRowCount() + " ；子控件总数："
+                    + flowLayoutAdapter.getItemCount() + " ；显示子控件数： " + childCount
+                    + " ；全部子控件是否显示完成： " + flowLayout.isChildViewShowFinish());
+            ToastUtils.showToast("总行数: " + flowLayout.getTotalRowCount() + " 子控件显示完成： " + flowLayout.isChildViewShowFinish());
         });
     }
 
@@ -60,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             return Integer.parseInt(trim);
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            return Integer.MAX_VALUE;
+            return -1;
         }
     }
 }
