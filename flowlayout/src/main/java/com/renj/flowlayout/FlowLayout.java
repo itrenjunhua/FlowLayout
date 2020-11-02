@@ -695,9 +695,9 @@ public class FlowLayout extends ViewGroup {
      */
     public interface OnChildLayoutFinishListener {
         /**
-         * @param flowLayout {@link FlowLayout} 控件对象
-         * @param childCount 当前完成布局的孩子数（显示的孩子数）
+         * @param flowLayout     {@link FlowLayout} 控件对象
+         * @param showChildCount 当前完成布局的孩子数（显示的孩子数）
          */
-        void onLayoutFinish(FlowLayout flowLayout, int childCount);
+        void onLayoutFinish(FlowLayout flowLayout, int showChildCount);
     }
 }

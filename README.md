@@ -16,7 +16,7 @@ Android 流式布局控件，实现自动换行，操出范围可以滑动功能
 
 ## 使用
 
-1. 在布局中使用控件
+1. 在布局中使用控件 [FlowLayout.java 完整代码](https://github.com/itrenjunhua/FlowLayout/blob/master/flowlayout/src/main/java/com/renj/flowlayout/FlowLayout.java)
 
 	    <com.renj.flowlayout.FlowLayout
 	            android:id="@+id/flow_layout"
@@ -32,7 +32,11 @@ Android 流式布局控件，实现自动换行，操出范围可以滑动功能
 	            app:flow_horizontal_spacing="6dp"
 	            app:flow_vertical_spacing="6dp" />
 
-2. 继承 `FlowLayoutAdapter` ，重写相关方法
+2. 继承 `FlowLayoutAdapter` ，重写相关方法 
+
+[FlowLayoutAdapter.java 完整代码](https://github.com/itrenjunhua/FlowLayout/blob/master/flowlayout/src/main/java/com/renj/flowlayout/FlowLayoutAdapter.java)
+
+[MainFlowLayoutAdapter.java 完整代码](https://github.com/itrenjunhua/FlowLayout/blob/master/app/src/main/java/com/renj/flowtest/MainFlowLayoutAdapter.java)
 
 		public class MainFlowLayoutAdapter extends FlowLayoutAdapter {
 		    private List<String> dataList;
@@ -65,7 +69,7 @@ Android 流式布局控件，实现自动换行，操出范围可以滑动功能
 		    }
 		}
 
-3. 给 `FlowLayout` 控件设置Adapter
+3. 给 `FlowLayout` 控件设置Adapter   [完整使用代码](https://github.com/itrenjunhua/FlowLayout/blob/master/app/src/main/java/com/renj/flowtest/MainActivity.java)
 
 		flowLayout.setAdapter(new MainFlowLayoutAdapter(DataUtils.getDataList(30)));
 
@@ -74,19 +78,29 @@ Android 流式布局控件，实现自动换行，操出范围可以滑动功能
 
 * setMaxRowCount(int maxRowCount)：设置最大显示行数，maxRowCount：最大显示行数  小于0表示全部显示
 * setHorizontalGravity(int horizontalGravity)：设置水平方向控件对齐方式，默认居左对齐，取值：
-	* FlowLayout.HORIZONTAL_GRAVITY_LEFT
-	* FlowLayout.HORIZONTAL_GRAVITY_LEFT
-	* FlowLayout.HORIZONTAL_GRAVITY_LEFT
-	* FlowLayout.HORIZONTAL_GRAVITY_LEFT
+	* `FlowLayout.HORIZONTAL_GRAVITY_LEFT` ：居左对齐，默认
+	* `FlowLayout.HORIZONTAL_GRAVITY_RIGHT` ： 居右对齐
+	* `FlowLayout.HORIZONTAL_GRAVITY_LEFT_RIGHT` ： 左右对齐/两端对齐
+	* `FlowLayout.HORIZONTAL_GRAVITY_CENTER` ： 居中对齐
 * setSpacing(int horizontalSpacing, int verticalSpacing)：设置子控件之间的间距
 * scrollToTop(boolean animation)：滚动到顶部，参数 true：使用动画滚动  false：不使用动画
 * scrollToBottom(boolean animation)：滚动到底部，参数 true：使用动画滚动  false：不使用动画
 * scrollToPosition(int position, boolean animation)：滚动到指定位置，参数 animation： true：使用动画滚动  false：不使用动画
 * scrollToRowNumber(int rowNumber, boolean animation)：滚动到指定行数，参数 animation： true：使用动画滚动  false：不使用动画
-* isChildViewAllShow()：是否所有的子控件都显示了，需要在 `setOnChildLayoutFinishListener(OnChildLayoutFinishListener)`  回调中调用保证结果的正确
-* getShowRowCount()：获取显示的行数，需要在 `setOnChildLayoutFinishListener(OnChildLayoutFinishListener)`  回调中调用保证结果的正确
 * setOnChildLayoutFinishListener(OnChildLayoutFinishListener onChildLayoutFinishListener)：设置子控件布局完成监听
 * setOnItemClickListener(OnItemClickListener onItemClickListener)：设置子控件点击监听
+* isChildViewAllShow()：是否所有的子控件都显示了，**需要在 `setOnChildLayoutFinishListener(OnChildLayoutFinishListener)`  回调中调用保证结果的正确**
+* getShowRowCount()：获取显示的行数，**需要在 `setOnChildLayoutFinishListener(OnChildLayoutFinishListener)`  回调中调用保证结果的正确**
+
+
+		// 设置子控件布局完成监听，在回调中调用 getShowRowCount() 和 isChildViewAllShow() 方法
+	    private void setFlowLayoutFinishListener() {
+	        flowLayout.setOnChildLayoutFinishListener((flowLayout, showChildCount) -> {
+	            Logger.i("子控件布局完成： 显示行数: " + flowLayout.getShowRowCount() + " ；子控件总数："
+	                    + flowLayoutAdapter.getItemCount() + " ；显示子控件数： " + showChildCount
+	                    + " ；全部子控件是否显示完成： " + flowLayout.isChildViewAllShow());
+	        });
+	    }
 
 ### 属性控制
 
