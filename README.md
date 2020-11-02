@@ -12,11 +12,7 @@ Android 流式布局控件，实现自动换行，操出范围可以滑动功能
 * 可以设置行内水平方向上对齐方式（居左对齐、居右对齐、两端对齐/左右对齐、居中对齐）
 * 提供自动滚动到顶部、滚动到底部、滚动到指定位置和滚动到指定行方法
 
-![左对齐](https://github.com/itrenjunhua/FlowLayout/blob/master/images/left.png)
-![右对齐](https://github.com/itrenjunhua/FlowLayout/blob/master/images/right.png)
-![左右对齐](https://github.com/itrenjunhua/FlowLayout/blob/master/images/left_right.png)
-![居中对齐](https://github.com/itrenjunhua/FlowLayout/blob/master/images/center.png)
-![设置最大行数](https://github.com/itrenjunhua/FlowLayout/blob/master/images/max_row.png)
+![效果图](https://github.com/itrenjunhua/FlowLayout/blob/master/images/FlowLayout.gif)
 
 ## 使用
 
