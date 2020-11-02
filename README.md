@@ -39,35 +39,35 @@ Android 流式布局控件，实现自动换行，操出范围可以滑动功能
 2. 继承 `FlowLayoutAdapter` ，重写相关方法
 
 		public class MainFlowLayoutAdapter extends FlowLayoutAdapter {
-	    private List<String> dataList;
-	    private int mCheckedPosition = -1;
-	
-	    public MainFlowLayoutAdapter(List<String> datas) {
-	        this.dataList = datas;
-	    }
-	
-	    @Override
-	    protected View createView(Context context, FlowLayout flowLayout, int position) {
-	        TextView textView = new TextView(context);
-	        textView.setTextSize(16);
-	        textView.setTextColor(context.getResources().getColor(R.color.color_text_grey));
-	        textView.setBackgroundResource(R.drawable.shape_text_bg);
-	        textView.setPadding(16, 6, 16, 6);
-			textView.setText(dataList.get(position));
-	        return textView;
-	    }
-	
-	    @Override
-	    public int getItemCount() {
-	        return dataList == null ? 0 : dataList.size();
-	    }
-	
-	    @Override
-	    public Object getItem(int position) {
-	        if (ListUtils.isEmpty(dataList)) return null;
-	        return dataList.get(position);
-	    }
-	}
+		    private List<String> dataList;
+		    private int mCheckedPosition = -1;
+
+		    public MainFlowLayoutAdapter(List<String> datas) {
+			this.dataList = datas;
+		    }
+
+		    @Override
+		    protected View createView(Context context, FlowLayout flowLayout, int position) {
+			TextView textView = new TextView(context);
+			textView.setTextSize(16);
+			textView.setTextColor(context.getResources().getColor(R.color.color_text_grey));
+			textView.setBackgroundResource(R.drawable.shape_text_bg);
+			textView.setPadding(16, 6, 16, 6);
+				textView.setText(dataList.get(position));
+			return textView;
+		    }
+
+		    @Override
+		    public int getItemCount() {
+			return dataList == null ? 0 : dataList.size();
+		    }
+
+		    @Override
+		    public Object getItem(int position) {
+			if (ListUtils.isEmpty(dataList)) return null;
+			return dataList.get(position);
+		    }
+		}
 
 3. 给 `FlowLayout` 控件设置Adapter
 
