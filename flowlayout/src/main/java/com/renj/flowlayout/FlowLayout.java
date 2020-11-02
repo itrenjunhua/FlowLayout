@@ -43,9 +43,11 @@ public class FlowLayout extends ViewGroup {
      */
     public static final int HORIZONTAL_GRAVITY_CENTER = 3;
 
-    private int mViewContentWidth = 0; // 内容显示宽度
-    private int mViewContentHeight = 0; // 内容显示高度
-    private int mViewReallyHeight = 0;  // 控件实际高度(所有子控件的高度和+paddingTop+paddingBottom)
+    private int mViewContentWidth; // 内容显示宽度
+    private int mViewContentHeight; // 内容显示高度
+    private int mViewReallyHeight;  // 控件实际高度(所有子控件的高度和+paddingTop+paddingBottom)
+    private int mHorizontalSpacing; // 水平方向间距
+    private int mVerticalSpacing;   // 竖直方向间距
 
     private int mShowChildViewCount; // 显示的子控件数
     private boolean mChildViewAllShow = true; // 子控件是否已经全部显示了
@@ -92,6 +94,8 @@ public class FlowLayout extends ViewGroup {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.FlowLayout);
         mMaxRowCount = typedArray.getInteger(R.styleable.FlowLayout_flow_max_row_count, Integer.MAX_VALUE);
         mHorizontalGravity = typedArray.getInteger(R.styleable.FlowLayout_flow_horizontal_gravity, HORIZONTAL_GRAVITY_LEFT);
+        mHorizontalSpacing = typedArray.getDimensionPixelSize(R.styleable.FlowLayout_flow_horizontal_spacing, 0);
+        mVerticalSpacing = typedArray.getDimensionPixelSize(R.styleable.FlowLayout_flow_vertical_spacing, 0);
         typedArray.recycle();
     }
 
@@ -182,6 +186,24 @@ public class FlowLayout extends ViewGroup {
     }
 
     /**
+     * 设置子控件之间的间距
+     *
+     * @param horizontalSpacing 水平方向间距 dp
+     * @param verticalSpacing   竖直方向间距 dp
+     */
+    public void setSpacing(int horizontalSpacing, int verticalSpacing) {
+        if (horizontalSpacing < 0 || verticalSpacing < 0) return;
+
+        horizontalSpacing = dip2px(getContext(), horizontalSpacing);
+        verticalSpacing = dip2px(getContext(), verticalSpacing);
+        if (this.mHorizontalSpacing != horizontalSpacing || this.mVerticalSpacing != verticalSpacing) {
+            this.mHorizontalSpacing = horizontalSpacing;
+            this.mVerticalSpacing = verticalSpacing;
+            requestLayout();
+        }
+    }
+
+    /**
      * 滚动到顶部
      *
      * @param animation true：使用动画滚动  false：不使用动画
@@ -259,7 +281,7 @@ public class FlowLayout extends ViewGroup {
     }
 
     /**
-     * 垂直方向平滑滚动方法
+     * 竖直方向平滑滚动方法
      *
      * @param startY 开始位置
      * @param dy     移动距离
@@ -328,6 +350,9 @@ public class FlowLayout extends ViewGroup {
         if (childCount > 0) {
             // 当前行已使用的宽度
             int currentRowWidth = 0;
+            // 当前子控件所需要的水平方向间距，因为间距数 = 水平方向一行子控件个数 - 1（最后一个没有间距）
+            // 本来是每行除最后一个之外，每个后面有间距；这里转换一下，变成除了第一个之外，后面每个在前面加一个间距
+            int currentHorizontalSpacing = 0;
             // 当前行的高度，以一行中最大高度的子控件高度为行高
             int currentRowMaxHeight = 0;
             // 总行数
@@ -338,6 +363,10 @@ public class FlowLayout extends ViewGroup {
             List<ChildViewInfo> mChildViewList = new ArrayList<>();
             for (int i = 0; i < childCount; i++) {
                 View childView = mFlowLayoutAdapter.createView(getContext(), this, i);
+                if (childView.getVisibility() == View.GONE) {
+                    continue;
+                }
+
                 addView(childView);
 
                 measureChild(childView, widthMeasureSpec, heightMeasureSpec);
@@ -357,7 +386,7 @@ public class FlowLayout extends ViewGroup {
                 int childViewWidth = childView.getMeasuredWidth();
                 int childViewHeight = childView.getMeasuredHeight();
                 // 计算当前行已使用的宽度
-                currentRowWidth += childViewWidth + childViewLeftMargin + childViewRightMargin;
+                currentRowWidth += childViewWidth + childViewLeftMargin + childViewRightMargin + currentHorizontalSpacing;
                 // 取一行最大高度为行高
                 currentRowMaxHeight = Math.max(childViewHeight + childViewTopMargin + childViewBottomMargin, currentRowMaxHeight);
                 // 换行
@@ -369,11 +398,14 @@ public class FlowLayout extends ViewGroup {
                     rowChildViewInfo.rowChildViews = mChildViewList;
                     rowChildViewInfo.rowNumber = mTotalShowRowCount;
                     rowChildViewInfo.rowHeight = currentRowMaxHeight;
-                    rowChildViewInfo.currentRowUsedWidth = currentRowWidth - (childViewWidth + childViewLeftMargin + childViewRightMargin);
+                    rowChildViewInfo.currentRowUsedWidth = currentRowWidth - (childViewWidth + childViewLeftMargin + childViewRightMargin + currentHorizontalSpacing);
                     mRowChildViewList.add(rowChildViewInfo);
 
+                    // 换行时设置为0，因为间距数 = 水平方向一行子控件个数 - 1 （最后一个没有间距）
+                    // 本来是每行除最后一个之外，每个后面有间距；这里转换一下，变成除了第一个之外，后面每个在前面加一个间距
+                    currentHorizontalSpacing = 0;
                     // 计算新行已使用宽度
-                    currentRowWidth = childViewWidth + childViewLeftMargin + childViewRightMargin;
+                    currentRowWidth = childViewWidth + childViewLeftMargin + childViewRightMargin + currentHorizontalSpacing;
                     // 新行高度
                     currentRowMaxHeight = childViewHeight + childViewTopMargin + childViewBottomMargin;
                     // 新行子控件集合
@@ -387,6 +419,9 @@ public class FlowLayout extends ViewGroup {
                         currentRowMaxHeight = 0;
                         break;
                     }
+
+                    // 增加竖直方向上的间距
+                    flowLayoutReallyHeight += mVerticalSpacing;
                 }
 
                 // 确定当前子控件所在的位置
@@ -397,6 +432,8 @@ public class FlowLayout extends ViewGroup {
                 childViewInfo.bottom = childViewInfo.top + childViewHeight;
                 mChildViewList.add(childViewInfo);
                 mShowChildViewCount += 1;
+                // 除了每行的第一个，后面的子控件都在前边加上一个水平间距
+                currentHorizontalSpacing = mHorizontalSpacing;
             }
             // 加上最后一行高度
             flowLayoutReallyHeight += currentRowMaxHeight;
@@ -583,6 +620,11 @@ public class FlowLayout extends ViewGroup {
     @Override
     protected LayoutParams generateLayoutParams(LayoutParams p) {
         return new MarginLayoutParams(p);
+    }
+
+    private int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
     }
 
     /**

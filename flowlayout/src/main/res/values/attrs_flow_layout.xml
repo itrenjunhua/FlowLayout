@@ -15,6 +15,10 @@
             <!-- 每一行水平方向对齐方式：居中对齐 -->
             <enum name="center" value="3" />
         </attr>
+        <!-- 水平方向间距 -->
+        <attr name="flow_horizontal_spacing" format="dimension" />
+        <!-- 竖直方向间距 -->
+        <attr name="flow_vertical_spacing" format="dimension" />
     </declare-styleable>
 
 </resources>

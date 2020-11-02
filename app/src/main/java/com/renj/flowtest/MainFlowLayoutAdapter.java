@@ -74,9 +74,9 @@ public class MainFlowLayoutAdapter extends FlowLayoutAdapter {
             textView.setBackgroundResource(R.drawable.shape_text_bg);
         }
         ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.topMargin = dip2px(context, 6);
-        params.leftMargin = dip2px(context, 3);
-        params.rightMargin = dip2px(context, 3);
+//        params.topMargin = dip2px(context, 6);
+//        params.leftMargin = dip2px(context, 3);
+//        params.rightMargin = dip2px(context, 3);
         textView.setLayoutParams(params);
         textView.setPadding(16, 6, 16, 6);
         return textView;
