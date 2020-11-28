@@ -139,6 +139,8 @@
         android:paddingTop="8dp"
         android:paddingEnd="8dp"
         android:paddingBottom="12dp"
-        app:flow_horizontal_gravity="right" />
+        app:flow_horizontal_gravity="right"
+        app:flow_horizontal_spacing="6dp"
+        app:flow_vertical_spacing="6dp" />
 
 </LinearLayout>

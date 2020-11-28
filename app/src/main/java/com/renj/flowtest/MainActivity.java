@@ -93,9 +93,9 @@ public class MainActivity extends AppCompatActivity {
 
     // 设置子控件布局完成监听
     private void setFlowLayoutFinishListener() {
-        flowLayout.setOnChildLayoutFinishListener((flowLayout, childCount) -> {
+        flowLayout.setOnChildLayoutFinishListener((flowLayout, showChildCount) -> {
             Logger.i("子控件布局完成： 显示行数: " + flowLayout.getShowRowCount() + " ；子控件总数："
-                    + flowLayoutAdapter.getItemCount() + " ；显示子控件数： " + childCount
+                    + flowLayoutAdapter.getItemCount() + " ；显示子控件数： " + showChildCount
                     + " ；全部子控件是否显示完成： " + flowLayout.isChildViewAllShow());
         });
     }
