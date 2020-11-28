@@ -43,9 +43,10 @@ public class FlowLayout extends ViewGroup {
      */
     public static final int HORIZONTAL_GRAVITY_CENTER = 3;
 
-    private int mViewContentWidth = 0; // 内容显示宽度
-    private int mViewContentHeight = 0; // 内容显示高度
-    private int mViewReallyHeight = 0;  // 控件实际高度(所有子控件的高度和+paddingTop+paddingBottom)
+    private int mViewContentWidth; // 内容显示宽度
+    private int mViewContentHeight; // 内容显示高度
+    private int mViewOldContentHeight; // 老的高度，当高度发生变化时，用来做高度变化动画
+    private int mViewReallyHeight;  // 控件实际高度(所有子控件的高度和+paddingTop+paddingBottom)
 
     private int mShowChildViewCount; // 显示的子控件数
     private boolean mChildViewAllShow = true; // 子控件是否已经全部显示了
@@ -338,6 +339,9 @@ public class FlowLayout extends ViewGroup {
             List<ChildViewInfo> mChildViewList = new ArrayList<>();
             for (int i = 0; i < childCount; i++) {
                 View childView = mFlowLayoutAdapter.createView(getContext(), this, i);
+                if (childView.getVisibility() == View.GONE) {
+                    continue;
+                }
                 addView(childView);
 
                 measureChild(childView, widthMeasureSpec, heightMeasureSpec);
