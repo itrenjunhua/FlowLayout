@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.Scroller;
 
@@ -505,22 +506,28 @@ public class FlowLayout extends ViewGroup {
             mOnChildLayoutFinishListener.onLayoutFinish(this, mShowChildViewCount);
     }
 
+    private float mInterceptDownX;
+    // 获取TouchSlop值
+    float mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        boolean intercepted = false;
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
-            case MotionEvent.ACTION_UP:
-                intercepted = false;
+                mInterceptDownX = ev.getRawX();
                 break;
             case MotionEvent.ACTION_MOVE:
-                intercepted = true;
+                float mXMove = ev.getRawX();
+                float diff = Math.abs(mXMove - mInterceptDownX);
+                // 当手指拖动值大于TouchSlop值时，认为应该进行滚动，拦截子控件的事件
+                if (diff > mTouchSlop) {
+                    return true;
+                }
                 break;
         }
-        return intercepted;
+        return super.onInterceptTouchEvent(ev);
     }
 
-    private boolean isActionDown;
     private int mTouchEventLastY;
 
     @Override
@@ -533,44 +540,36 @@ public class FlowLayout extends ViewGroup {
             int y = (int) event.getY();
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    // 不处理按下事件，防止和子控件的点击事件冲突。
-                    // 所以将滑动的第一个坐标作为起始坐标
+                    mTouchEventLastY = y;
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    if (!isActionDown) {
-                        // 将滑动的第一个坐标作为起始坐标
-                        mTouchEventLastY = y;
-                        isActionDown = true;
-                    } else {
-                        if (!mScroller.isFinished()) {
-                            mScroller.abortAnimation();
-                        }
-                        int dy = mTouchEventLastY - y;
-                        // 向上滑动
-                        if (dy < 0) {
-                            if (getScrollY() == 0) {
-                                return super.onTouchEvent(event);
-                            }
-                            if (getScrollY() + dy < 0) {
-                                scrollTo(0, 0);
-                                return true;
-                            }
-                        } else {
-                            // 向下滑动
-                            if (getScrollY() == mMaxScrollY) {
-                                return super.onTouchEvent(event);
-                            }
-                            if (getScrollY() + dy > mMaxScrollY) {
-                                scrollTo(0, mMaxScrollY);
-                                return true;
-                            }
-                        }
-                        scrollBy(0, dy);
-                        mTouchEventLastY = y;
+                    if (!mScroller.isFinished()) {
+                        mScroller.abortAnimation();
                     }
+                    int dy = mTouchEventLastY - y;
+                    // 向上滑动
+                    if (dy < 0) {
+                        if (getScrollY() == 0) {
+                            return super.onTouchEvent(event);
+                        }
+                        if (getScrollY() + dy < 0) {
+                            scrollTo(0, 0);
+                            return true;
+                        }
+                    } else {
+                        // 向下滑动
+                        if (getScrollY() == mMaxScrollY) {
+                            return super.onTouchEvent(event);
+                        }
+                        if (getScrollY() + dy > mMaxScrollY) {
+                            scrollTo(0, mMaxScrollY);
+                            return true;
+                        }
+                    }
+                    scrollBy(0, dy);
+                    mTouchEventLastY = y;
                     break;
                 case MotionEvent.ACTION_UP:
-                    isActionDown = false;
                     mVelocityTracker.computeCurrentVelocity(1000);
                     int initialVelocity = (int) mVelocityTracker.getYVelocity();
                     if (Math.abs(initialVelocity) > 200) {
